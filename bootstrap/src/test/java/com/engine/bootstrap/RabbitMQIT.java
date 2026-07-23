@@ -99,7 +99,7 @@ class RabbitMQIT {
         outboxJpaRepository.save(entity);
 
         // Act
-        outboxPoller.processPendingRows(); // manually invoke to avoid waiting for @Scheduled
+        outboxPoller.pollOutbox(); // manually invoke to avoid waiting for @Scheduled
 
         // Assert
         OutboxEntity processed = outboxJpaRepository.findById(eventId).orElseThrow();
