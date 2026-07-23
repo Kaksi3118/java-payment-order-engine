@@ -25,7 +25,7 @@ The project is under active development, built stage by stage with verified comm
 | Identity security adapters | ✅ Done | `BcryptPasswordHasher` (BCrypt with randomized salt), `JwtIssuerAdapter` (RS256 JWT with access/refresh token split + `typ` discriminator), `SecurityConfig` (stateless OAuth2 resource server), `JwtConfig` (RSA-2048 keypair + encoder/decoder beans), `JwtProperties` (validated TTL config) |
 | Identity persistence adapters | ✅ Done | JPA `UserEntity` + `UserRepositoryAdapter` (load-then-update preserving `@Version`), `OutboxEntity` + `OutboxAdapter` (JSON-serialized events with PENDING status), Flyway V1 migration (`users`, `user_roles`, `outbox_events`) |
 | Identity REST controllers | ✅ Done | `AuthController` (`POST /api/auth/register` with `Idempotency-Key` header, `POST /api/auth/login`), `GlobalExceptionHandler` (domain exceptions → HTTP 409/401/403/400), Bean Validation on request DTOs |
-| Identity integration tests | 🚧 Next | Testcontainers (real Postgres) end-to-end JWT roundtrip |
+| Identity integration tests | ✅ Done | `IdentityIT` (5 tests) with Testcontainers + PostgreSQL 17 — register/outbox/activate/authenticate/duplicate end-to-end. Skipped automatically when `DOCKER_HOST` is not set (Docker API compatibility guard) |
 | Order bounded context | 📋 Planned | Outbox, idempotency, CQRS, optimistic + pessimistic locking, Redis distributed locks |
 | Payment bounded context | 📋 Planned | External gateway client with Resilience4j (circuit breaker, retry, rate limiter) |
 | RabbitMQ wiring | 📋 Planned | DLQ topology, outbox poller with Redis distributed lock |
@@ -275,7 +275,7 @@ Circuit Breaker (transitions OPEN after a configurable failure rate, half-open t
 - [x] **Stage 3c-i** — Identity security adapters (BCrypt hasher, RS256 JWT issuer, Spring Security config).
 - [x] **Stage 3c-ii** — Identity persistence adapters (JPA entity + repository adapter, outbox entity + adapter, Flyway V1 migration).
 - [x] **Stage 3c-iii** — Identity REST controllers + `Idempotency-Key` enforcement + global exception handler.
-- [ ] **Stage 3c-iv** — Flyway migrations + Testcontainers integration tests.
+- [x] **Stage 3c-iv** — Flyway V1 migration + Testcontainers integration tests (`IdentityIT`).
 - [ ] **Stage 4** — Order bounded context (outbox + idempotency + CQRS + concurrency control).
 - [ ] **Stage 5** — Payment bounded context (Resilience4j gateway client + retries).
 - [ ] **Stage 6** — RabbitMQ wiring (DLQ topology + outbox poller).
