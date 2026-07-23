@@ -23,8 +23,8 @@ The project is under active development, built stage by stage with verified comm
 | Identity domain | ✅ Done | `User` aggregate (PENDING→ACTIVE→SUSPENDED/DEACTIVATED state machine), `Email`, `PasswordHash`, `Role`, `Roles`, `UserStatus`, `JwtTokens`, 3 domain exceptions, driving ports (`RegisterUserUseCase`, `AuthenticateUserUseCase`), driven ports (`UserRepository`, `PasswordHasher`, `JwtIssuer`) |
 | Identity application | ✅ Done | `RegisterUserService` (transactional outbox orchestration), `AuthenticateUserService` (read-only, no user enumeration) |
 | Identity security adapters | ✅ Done | `BcryptPasswordHasher` (BCrypt with randomized salt), `JwtIssuerAdapter` (RS256 JWT with access/refresh token split + `typ` discriminator), `SecurityConfig` (stateless OAuth2 resource server), `JwtConfig` (RSA-2048 keypair + encoder/decoder beans), `JwtProperties` (validated TTL config) |
-| Identity persistence adapters | 🚧 Next | JPA `UserEntity` + `UserJpaRepository` + `UserRepositoryAdapter`, `OutboxEntity` + `OutboxAdapter` |
-| Identity REST controllers | 🚧 Planned | `AuthController` with `Idempotency-Key` enforcement, global exception handler |
+| Identity persistence adapters | ✅ Done | JPA `UserEntity` + `UserRepositoryAdapter` (load-then-update preserving `@Version`), `OutboxEntity` + `OutboxAdapter` (JSON-serialized events with PENDING status), Flyway V1 migration (`users`, `user_roles`, `outbox_events`) |
+| Identity REST controllers | 🚧 Next | `AuthController` with `Idempotency-Key` enforcement, global exception handler |
 | Identity integration tests | 🚧 Planned | Testcontainers (real Postgres) end-to-end JWT roundtrip |
 | Order bounded context | 📋 Planned | Outbox, idempotency, CQRS, optimistic + pessimistic locking, Redis distributed locks |
 | Payment bounded context | 📋 Planned | External gateway client with Resilience4j (circuit breaker, retry, rate limiter) |
@@ -32,7 +32,7 @@ The project is under active development, built stage by stage with verified comm
 | Observability | 📋 Planned | Micrometer + Prometheus + Grafana dashboards |
 | CI/CD | 📋 Planned | GitHub Actions workflow |
 
-**Test count:** 93 tests green (`./mvnw clean verify` → BUILD SUCCESS) — 34 shared-kernel + 51 identity + 8 ArchUnit architecture rules.
+**Test count:** 102 tests green (`./mvnw clean verify` → BUILD SUCCESS) — 34 shared-kernel + 60 identity + 8 ArchUnit architecture rules.
 
 ---
 
@@ -273,7 +273,7 @@ Circuit Breaker (transitions OPEN after a configurable failure rate, half-open t
 - [x] **Stage 3a** — Identity domain layer (`User` aggregate, value objects, ports, events, state machine).
 - [x] **Stage 3b** — Identity application layer (`RegisterUserService`, `AuthenticateUserService`, `EventOutbox` port).
 - [x] **Stage 3c-i** — Identity security adapters (BCrypt hasher, RS256 JWT issuer, Spring Security config).
-- [ ] **Stage 3c-ii** — Identity persistence adapters (JPA entity + repository adapter, outbox entity + adapter).
+- [x] **Stage 3c-ii** — Identity persistence adapters (JPA entity + repository adapter, outbox entity + adapter, Flyway V1 migration).
 - [ ] **Stage 3c-iii** — Identity REST controllers + `Idempotency-Key` enforcement + global exception handler.
 - [ ] **Stage 3c-iv** — Flyway migrations + Testcontainers integration tests.
 - [ ] **Stage 4** — Order bounded context (outbox + idempotency + CQRS + concurrency control).

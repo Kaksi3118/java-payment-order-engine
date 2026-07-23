@@ -61,6 +61,20 @@ public final class User extends AggregateRoot {
         return user;
     }
 
+    /**
+     * Reconstitution factory: reconstructs a {@link User} from persisted state <strong>without
+     * raising domain events</strong>. Used exclusively by the persistence adapter
+     * ({@code UserRepositoryAdapter}) when loading from the database &mdash; events were already
+     * raised and published when the user was originally created or transitioned.
+     *
+     * <p>This is the standard DDD reconstitution pattern: the aggregate is rebuilt from its
+     * constituent parts exactly as it was persisted, with no side effects.
+     */
+    public static User reconstitute(UserId id, Email email, PasswordHash passwordHash, Roles roles,
+                                    UserStatus status, Instant createdAt, Instant updatedAt) {
+        return new User(id, email, passwordHash, roles, status, createdAt, updatedAt);
+    }
+
     public void activate(Clock clock) {
         if (status == UserStatus.ACTIVE) {
             throw new IllegalStateException("User is already ACTIVE");
