@@ -61,4 +61,4 @@ HELP.md
 .mvn/wrapper/maven-wrapper.jar
 .gradle/
 build/
-out/
+/out/
