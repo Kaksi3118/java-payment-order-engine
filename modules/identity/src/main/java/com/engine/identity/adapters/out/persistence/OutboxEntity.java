@@ -82,4 +82,8 @@ public class OutboxEntity {
     public Instant getCreatedAt() { return createdAt; }
     public int getRetryCount() { return retryCount; }
     public Long getVersion() { return version; }
+
+    public void markPublished() {
+        this.status = OutboxStatus.PUBLISHED;
+    }
 }

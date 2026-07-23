@@ -8,6 +8,15 @@ spring:
     url: jdbc:postgresql://${POE_POSTGRES_HOST:localhost}:${POE_POSTGRES_PORT:5432}/${POE_POSTGRES_DB:poe}
     username: ${POE_POSTGRES_USER:poe}
     password: ${POE_POSTGRES_PASSWORD:poe_dev_password}
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
+  data:
+    redis:
+      host: localhost
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: validate
