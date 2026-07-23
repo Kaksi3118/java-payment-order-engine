@@ -24,15 +24,15 @@ The project is under active development, built stage by stage with verified comm
 | Identity application | ✅ Done | `RegisterUserService` (transactional outbox orchestration), `AuthenticateUserService` (read-only, no user enumeration) |
 | Identity security adapters | ✅ Done | `BcryptPasswordHasher` (BCrypt with randomized salt), `JwtIssuerAdapter` (RS256 JWT with access/refresh token split + `typ` discriminator), `SecurityConfig` (stateless OAuth2 resource server), `JwtConfig` (RSA-2048 keypair + encoder/decoder beans), `JwtProperties` (validated TTL config) |
 | Identity persistence adapters | ✅ Done | JPA `UserEntity` + `UserRepositoryAdapter` (load-then-update preserving `@Version`), `OutboxEntity` + `OutboxAdapter` (JSON-serialized events with PENDING status), Flyway V1 migration (`users`, `user_roles`, `outbox_events`) |
-| Identity REST controllers | 🚧 Next | `AuthController` with `Idempotency-Key` enforcement, global exception handler |
-| Identity integration tests | 🚧 Planned | Testcontainers (real Postgres) end-to-end JWT roundtrip |
+| Identity REST controllers | ✅ Done | `AuthController` (`POST /api/auth/register` with `Idempotency-Key` header, `POST /api/auth/login`), `GlobalExceptionHandler` (domain exceptions → HTTP 409/401/403/400), Bean Validation on request DTOs |
+| Identity integration tests | 🚧 Next | Testcontainers (real Postgres) end-to-end JWT roundtrip |
 | Order bounded context | 📋 Planned | Outbox, idempotency, CQRS, optimistic + pessimistic locking, Redis distributed locks |
 | Payment bounded context | 📋 Planned | External gateway client with Resilience4j (circuit breaker, retry, rate limiter) |
 | RabbitMQ wiring | 📋 Planned | DLQ topology, outbox poller with Redis distributed lock |
 | Observability | 📋 Planned | Micrometer + Prometheus + Grafana dashboards |
 | CI/CD | 📋 Planned | GitHub Actions workflow |
 
-**Test count:** 102 tests green (`./mvnw clean verify` → BUILD SUCCESS) — 34 shared-kernel + 60 identity + 8 ArchUnit architecture rules.
+**Test count:** 111 tests green (`./mvnw clean verify` → BUILD SUCCESS) — 34 shared-kernel + 69 identity + 8 ArchUnit architecture rules.
 
 ---
 
@@ -274,7 +274,7 @@ Circuit Breaker (transitions OPEN after a configurable failure rate, half-open t
 - [x] **Stage 3b** — Identity application layer (`RegisterUserService`, `AuthenticateUserService`, `EventOutbox` port).
 - [x] **Stage 3c-i** — Identity security adapters (BCrypt hasher, RS256 JWT issuer, Spring Security config).
 - [x] **Stage 3c-ii** — Identity persistence adapters (JPA entity + repository adapter, outbox entity + adapter, Flyway V1 migration).
-- [ ] **Stage 3c-iii** — Identity REST controllers + `Idempotency-Key` enforcement + global exception handler.
+- [x] **Stage 3c-iii** — Identity REST controllers + `Idempotency-Key` enforcement + global exception handler.
 - [ ] **Stage 3c-iv** — Flyway migrations + Testcontainers integration tests.
 - [ ] **Stage 4** — Order bounded context (outbox + idempotency + CQRS + concurrency control).
 - [ ] **Stage 5** — Payment bounded context (Resilience4j gateway client + retries).
