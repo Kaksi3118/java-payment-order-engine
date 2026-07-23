@@ -43,6 +43,12 @@ class ArchitectureArchTest {
                     .because("the hexagonal dependency rule forbids the domain depending on its adapters");
 
     @ArchTest
+    static final ArchRule domainLayerMustNotDependOnApplication =
+            noClasses().that().resideInAPackage("..domain..")
+                    .should().dependOnClassesThat().resideInAPackage("..application..")
+                    .because("the domain layer is the innermost ring and must not depend on the application layer that orchestrates it; application depends on domain, never the reverse");
+
+    @ArchTest
     static final ArchRule applicationLayerMustNotDependOnAdapters =
             noClasses().that().resideInAPackage("..application..")
                     .should().dependOnClassesThat().resideInAPackage("..adapters..")
