@@ -1,9 +1,5 @@
-feat(observability): add micrometer metrics and grafana dashboards
+feat(ci): add GitHub Actions build pipeline
 
-- pom.xml: Add micrometer-registry-prometheus and micrometer-core
-- PaymentGatewayClient: Add payment.gateway.calls and payment.gateway.latency metrics
-- OutboxPoller: Add outbox.pending.count gauge metric
-- PlaceOrderService: Add order.placed.count metric
-- docker-compose.yml: Add Prometheus and Grafana services
-- grafana/prometheus: Add provisioning files and PoE dashboard
-- ./mvnw clean verify: BUILD SUCCESS
+- .github/workflows/build.yml: Configure CI pipeline to run on push/PR to main
+- Environment: Ubuntu-latest with Java 21 (Temurin) and Docker pre-installed
+- Command: ./mvnw -B -ntp clean verify to ensure compilation, unit tests, ArchUnit, and Testcontainers ITs all pass
