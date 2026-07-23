@@ -2,11 +2,37 @@
 
 > A production-grade backend showcase built with **Java 21** and **Spring Boot 3**, demonstrating how to solve the hard problems of a modern e-commerce / fintech platform: high traffic spikes, asynchronous transaction processing, partial network failures, concurrent data modifications, and strict consistency requirements under eventual consistency.
 
-[![CI](https://github.com/USERNAME/java-payment-order-engine/actions/workflows/ci.yml/badge.svg)](./.github/workflows)
+[![CI](https://github.com/Kaksi3118/java-payment-order-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Kaksi3118/java-payment-order-engine/actions)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-green?logo=springboot)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Maven-3.9.x-blue?logo=apachemaven)](https://maven.apache.org/)
+[![Tests](https://img.shields.io/badge/tests-93%20green-brightgreen)](https://github.com/Kaksi3118/java-payment-order-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+---
+
+## Current Status
+
+The project is under active development, built stage by stage with verified commits. The table below tracks what's been built and what's next.
+
+| Area | Status | Details |
+| --- | --- | --- |
+| Project scaffold | ✅ Done | Multi-module Maven reactor, hexagonal package layout, Maven Wrapper 3.9.9, `docker-compose.yml` (Postgres 17 + Redis 7 + RabbitMQ 3.13), `.gitignore`, `.editorconfig`, `.gitattributes`, PR template |
+| Shared Kernel | ✅ Done | `Money` (HALF_EVEN), typed UUIDs (`OrderId`, `PaymentId`, `UserId`, `TransactionId`), `AggregateRoot`, `DomainEvent`, `EventOutbox` port |
+| ArchUnit guardrails | ✅ Done | 8 active rules: domain purity (no Spring/JPA/Jackson/SLF4J), domain→application forbidden, domain→adapters forbidden, application→adapters forbidden, adapters.in→adapters.out forbidden, cross-context isolation (order↔payment↔identity) |
+| Identity domain | ✅ Done | `User` aggregate (PENDING→ACTIVE→SUSPENDED/DEACTIVATED state machine), `Email`, `PasswordHash`, `Role`, `Roles`, `UserStatus`, `JwtTokens`, 3 domain exceptions, driving ports (`RegisterUserUseCase`, `AuthenticateUserUseCase`), driven ports (`UserRepository`, `PasswordHasher`, `JwtIssuer`) |
+| Identity application | ✅ Done | `RegisterUserService` (transactional outbox orchestration), `AuthenticateUserService` (read-only, no user enumeration) |
+| Identity security adapters | ✅ Done | `BcryptPasswordHasher` (BCrypt with randomized salt), `JwtIssuerAdapter` (RS256 JWT with access/refresh token split + `typ` discriminator), `SecurityConfig` (stateless OAuth2 resource server), `JwtConfig` (RSA-2048 keypair + encoder/decoder beans), `JwtProperties` (validated TTL config) |
+| Identity persistence adapters | 🚧 Next | JPA `UserEntity` + `UserJpaRepository` + `UserRepositoryAdapter`, `OutboxEntity` + `OutboxAdapter` |
+| Identity REST controllers | 🚧 Planned | `AuthController` with `Idempotency-Key` enforcement, global exception handler |
+| Identity integration tests | 🚧 Planned | Testcontainers (real Postgres) end-to-end JWT roundtrip |
+| Order bounded context | 📋 Planned | Outbox, idempotency, CQRS, optimistic + pessimistic locking, Redis distributed locks |
+| Payment bounded context | 📋 Planned | External gateway client with Resilience4j (circuit breaker, retry, rate limiter) |
+| RabbitMQ wiring | 📋 Planned | DLQ topology, outbox poller with Redis distributed lock |
+| Observability | 📋 Planned | Micrometer + Prometheus + Grafana dashboards |
+| CI/CD | 📋 Planned | GitHub Actions workflow |
+
+**Test count:** 93 tests green (`./mvnw clean verify` → BUILD SUCCESS) — 34 shared-kernel + 51 identity + 8 ArchUnit architecture rules.
 
 ---
 
@@ -243,10 +269,15 @@ Circuit Breaker (transitions OPEN after a configurable failure rate, half-open t
 ## Roadmap
 
 - [x] **Stage 1** — Repository scaffold, hexagonal module layout, parent POM, `docker-compose.yml`, Maven Wrapper, repo-quality files.
-- [ ] **Stage 2** — Shared Kernel (`Money`, IDs, `DomainEvent`) + ArchUnit anatomy tests.
-- [ ] **Stage 3** — Identity module (JWT auth + RBAC).
-- [ ] **Stage 4** — Order module (outbox + idempotency + CQRS + concurrency control).
-- [ ] **Stage 5** — Payment module (Resilience4j gateway client + retries).
+- [x] **Stage 2** — Shared Kernel (`Money`, typed IDs, `DomainEvent`, `AggregateRoot`) + ArchUnit guardrails (8 rules).
+- [x] **Stage 3a** — Identity domain layer (`User` aggregate, value objects, ports, events, state machine).
+- [x] **Stage 3b** — Identity application layer (`RegisterUserService`, `AuthenticateUserService`, `EventOutbox` port).
+- [x] **Stage 3c-i** — Identity security adapters (BCrypt hasher, RS256 JWT issuer, Spring Security config).
+- [ ] **Stage 3c-ii** — Identity persistence adapters (JPA entity + repository adapter, outbox entity + adapter).
+- [ ] **Stage 3c-iii** — Identity REST controllers + `Idempotency-Key` enforcement + global exception handler.
+- [ ] **Stage 3c-iv** — Flyway migrations + Testcontainers integration tests.
+- [ ] **Stage 4** — Order bounded context (outbox + idempotency + CQRS + concurrency control).
+- [ ] **Stage 5** — Payment bounded context (Resilience4j gateway client + retries).
 - [ ] **Stage 6** — RabbitMQ wiring (DLQ topology + outbox poller).
 - [ ] **Stage 7** — Observability (Prometheus + Grafana).
 - [ ] **Stage 8** — GitHub Actions CI.
