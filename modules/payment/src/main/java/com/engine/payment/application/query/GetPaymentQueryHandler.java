@@ -28,7 +28,8 @@ public class GetPaymentQueryHandler implements GetPaymentQuery {
                 payment.status(),
                 payment.amount(),
                 payment.capturedAmount(),
-                payment.refundedAmount()
+                payment.refundedAmount(),
+                payment.gatewayReference()
         );
     }
 }
