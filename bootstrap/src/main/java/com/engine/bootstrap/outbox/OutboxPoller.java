@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Gauge;
 
@@ -30,11 +30,13 @@ public class OutboxPoller {
     private final OutboxJpaRepository outboxJpaRepository;
     private final RabbitTemplate rabbitTemplate;
     private final RedissonClient redissonClient;
+    private final TransactionTemplate transactionTemplate;
 
-    public OutboxPoller(OutboxJpaRepository outboxJpaRepository, RabbitTemplate rabbitTemplate, RedissonClient redissonClient, MeterRegistry meterRegistry) {
+    public OutboxPoller(OutboxJpaRepository outboxJpaRepository, RabbitTemplate rabbitTemplate, RedissonClient redissonClient, MeterRegistry meterRegistry, TransactionTemplate transactionTemplate) {
         this.outboxJpaRepository = outboxJpaRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.redissonClient = redissonClient;
+        this.transactionTemplate = transactionTemplate;
         Gauge.builder("outbox.pending.count", outboxJpaRepository, repo -> repo.countByStatus(OutboxStatus.PENDING))
              .description("Number of pending events in the outbox")
              .register(meterRegistry);
@@ -43,21 +45,16 @@ public class OutboxPoller {
     @Scheduled(fixedDelay = 5000)
     public void pollOutbox() {
         RLock lock = redissonClient.getLock("outbox-dispatcher");
-        try {
-            if (lock.tryLock(0, 4, TimeUnit.SECONDS)) {
-                try {
-                    processPendingRows();
-                } finally {
-                    lock.unlock();
-                }
+        if (lock.tryLock()) {
+            try {
+                transactionTemplate.executeWithoutResult(status -> processPendingRows());
+            } finally {
+                lock.unlock();
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
-    @Transactional
-    public void processPendingRows() {
+    private void processPendingRows() {
         List<OutboxEntity> pendingEvents = outboxJpaRepository.findByStatusOrderByCreatedAtAsc(OutboxStatus.PENDING);
         for (OutboxEntity event : pendingEvents) {
             String exchange = resolveExchange(event.getEventType());
