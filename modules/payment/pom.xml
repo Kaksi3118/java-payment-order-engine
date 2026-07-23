@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.engine</groupId>
+        <artifactId>payment-order-engine-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>payment</artifactId>
+    <name>Payment Bounded Context</name>
+    <description>
+        Payment processing: authorization, capture, refund. Integrates with an external
+        payment gateway via Resilience4j (circuit breaker, retry, rate limiter).
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.engine</groupId>
+            <artifactId>shared-kernel</artifactId>
+        </dependency>
+    </dependencies>
+</project>

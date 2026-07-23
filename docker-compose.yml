@@ -1,0 +1,62 @@
+name: payment-order-engine
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: poe-postgres
+    environment:
+      POSTGRES_DB: ${POE_POSTGRES_DB:-poe}
+      POSTGRES_USER: ${POE_POSTGRES_USER:-poe}
+      POSTGRES_PASSWORD: ${POE_POSTGRES_PASSWORD:-poe_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - poe-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POE_POSTGRES_USER:-poe} -d ${POE_POSTGRES_DB:-poe}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [poe-net]
+
+  redis:
+    image: redis:7-alpine
+    container_name: poe-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - poe-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [poe-net]
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: poe-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${POE_RABBITMQ_USER:-poe}
+      RABBITMQ_DEFAULT_PASS: ${POE_RABBITMQ_PASSWORD:-poe_dev_password}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - poe-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [poe-net]
+
+volumes:
+  poe-postgres-data:
+  poe-redis-data:
+  poe-rabbitmq-data:
+
+networks:
+  poe-net:
+    driver: bridge
