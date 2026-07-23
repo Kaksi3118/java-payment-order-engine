@@ -8,6 +8,8 @@ import com.engine.order.domain.port.in.PlaceOrderUseCase.PlaceOrderResult;
 import com.engine.shared.domain.ids.UserId;
 import com.engine.shared.domain.model.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +34,7 @@ class PlaceOrderServiceTest {
     private FakeIdempotencyPort idempotencyPort;
     private FakeEventOutbox eventOutbox;
     private PlaceOrderService service;
+    private MeterRegistry meterRegistry;
 
     private static final Clock FIXED_CLOCK =
             Clock.fixed(Instant.parse("2026-07-23T12:00:00Z"), ZoneOffset.UTC);
@@ -51,10 +54,11 @@ class PlaceOrderServiceTest {
         inventoryPort = new FakeInventoryPort();
         idempotencyPort = new FakeIdempotencyPort();
         eventOutbox = new FakeEventOutbox();
+        meterRegistry = new SimpleMeterRegistry();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         service = new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort,
-                eventOutbox, objectMapper, FIXED_CLOCK);
+                eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry);
     }
 
     @Nested
@@ -142,15 +146,23 @@ class PlaceOrderServiceTest {
         @Test
         @DisplayName("constructor rejects null dependencies")
         void constructorRejectsNulls() {
-            ObjectMapper mapper = new ObjectMapper();
-            assertThatThrownBy(() -> new PlaceOrderService(null, inventoryPort, idempotencyPort,
-                    eventOutbox, mapper, FIXED_CLOCK))
+            ObjectMapper objectMapper = new ObjectMapper();
+            assertThatThrownBy(() -> new PlaceOrderService(null, inventoryPort, idempotencyPort, eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry))
                     .isInstanceOf(NullPointerException.class);
-            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, null, idempotencyPort,
-                    eventOutbox, mapper, FIXED_CLOCK))
+
+            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, null, idempotencyPort, eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry))
                     .isInstanceOf(NullPointerException.class);
-            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, inventoryPort, null,
-                    eventOutbox, mapper, FIXED_CLOCK))
+
+            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, inventoryPort, null, eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry))
+                    .isInstanceOf(NullPointerException.class);
+
+            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort, null, objectMapper, FIXED_CLOCK, meterRegistry))
+                    .isInstanceOf(NullPointerException.class);
+
+            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort, eventOutbox, null, FIXED_CLOCK, meterRegistry))
+                    .isInstanceOf(NullPointerException.class);
+
+            assertThatThrownBy(() -> new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort, eventOutbox, objectMapper, null, meterRegistry))
                     .isInstanceOf(NullPointerException.class);
         }
     }

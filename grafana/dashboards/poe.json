@@ -1,0 +1,52 @@
+{
+  "title": "Payment Order Engine",
+  "panels": [
+    {
+      "title": "Outbox Pending Count",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "outbox_pending_count",
+          "legendFormat": "Pending Events"
+        }
+      ]
+    },
+    {
+      "title": "Order Placed Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(order_placed_count_total[1m])",
+          "legendFormat": "Orders / sec"
+        }
+      ]
+    },
+    {
+      "title": "Payment Gateway Calls Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(payment_gateway_calls_total[1m])",
+          "legendFormat": "Calls / sec"
+        }
+      ]
+    },
+    {
+      "title": "Payment Gateway Latency (avg)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(payment_gateway_latency_seconds_sum[1m]) / rate(payment_gateway_latency_seconds_count[1m])",
+          "legendFormat": "Latency (s)"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "timezone": "browser",
+  "refresh": "5s"
+}

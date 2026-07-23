@@ -10,6 +10,8 @@ import com.engine.shared.domain.port.out.EventOutbox;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Counter;
 
 import java.time.Clock;
 import java.util.Objects;
@@ -46,19 +48,22 @@ public class PlaceOrderService implements PlaceOrderUseCase {
     private final EventOutbox eventOutbox;
     private final ObjectMapper objectMapper;
     private final Clock clock;
+    private final Counter orderPlacedCounter;
 
     public PlaceOrderService(OrderRepository orderRepository,
                              InventoryPort inventoryPort,
                              IdempotencyPort idempotencyPort,
                              EventOutbox eventOutbox,
                              ObjectMapper objectMapper,
-                             Clock clock) {
+                             Clock clock,
+                             MeterRegistry meterRegistry) {
         this.orderRepository = Objects.requireNonNull(orderRepository, "OrderRepository must not be null");
         this.inventoryPort = Objects.requireNonNull(inventoryPort, "InventoryPort must not be null");
         this.idempotencyPort = Objects.requireNonNull(idempotencyPort, "IdempotencyPort must not be null");
         this.eventOutbox = Objects.requireNonNull(eventOutbox, "EventOutbox must not be null");
         this.objectMapper = Objects.requireNonNull(objectMapper, "ObjectMapper must not be null");
         this.clock = Objects.requireNonNull(clock, "Clock must not be null");
+        this.orderPlacedCounter = meterRegistry.counter("order.placed.count");
     }
 
     @Override
@@ -83,6 +88,8 @@ public class PlaceOrderService implements PlaceOrderUseCase {
         PlaceOrderResult result = new PlaceOrderResult(order.idValue());
         idempotencyPort.saveResult(command.idempotencyKey(), command.requestHash(),
                 serializeResult(result));
+
+        orderPlacedCounter.increment();
 
         return result;
     }

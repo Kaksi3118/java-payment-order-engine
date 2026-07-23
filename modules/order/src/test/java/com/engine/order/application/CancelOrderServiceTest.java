@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -50,8 +52,9 @@ class CancelOrderServiceTest {
         eventOutbox = new FakeEventOutbox();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        MeterRegistry meterRegistry = new SimpleMeterRegistry();
         placeOrderService = new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort,
-                eventOutbox, objectMapper, FIXED_CLOCK);
+                eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry);
         cancelOrderService = new CancelOrderService(orderRepository, inventoryPort, idempotencyPort,
                 eventOutbox, FIXED_CLOCK);
     }

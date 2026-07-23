@@ -14,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Gauge;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,10 +31,13 @@ public class OutboxPoller {
     private final RabbitTemplate rabbitTemplate;
     private final RedissonClient redissonClient;
 
-    public OutboxPoller(OutboxJpaRepository outboxJpaRepository, RabbitTemplate rabbitTemplate, RedissonClient redissonClient) {
+    public OutboxPoller(OutboxJpaRepository outboxJpaRepository, RabbitTemplate rabbitTemplate, RedissonClient redissonClient, MeterRegistry meterRegistry) {
         this.outboxJpaRepository = outboxJpaRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.redissonClient = redissonClient;
+        Gauge.builder("outbox.pending.count", outboxJpaRepository, repo -> repo.countByStatus(OutboxStatus.PENDING))
+             .description("Number of pending events in the outbox")
+             .register(meterRegistry);
     }
 
     @Scheduled(fixedDelay = 5000)

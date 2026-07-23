@@ -9,6 +9,8 @@ import com.engine.shared.domain.ids.OrderId;
 import com.engine.shared.domain.ids.UserId;
 import com.engine.shared.domain.model.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,8 +47,9 @@ class GetOrderQueryHandlerTest {
         eventOutbox = new FakeEventOutbox();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        MeterRegistry meterRegistry = new SimpleMeterRegistry();
         placeOrderService = new PlaceOrderService(orderRepository, inventoryPort, idempotencyPort,
-                eventOutbox, objectMapper, FIXED_CLOCK);
+                eventOutbox, objectMapper, FIXED_CLOCK, meterRegistry);
         queryHandler = new GetOrderQueryHandler(orderRepository);
     }
 

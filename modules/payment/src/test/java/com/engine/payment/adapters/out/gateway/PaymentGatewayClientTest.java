@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 import java.util.Currency;
 
@@ -30,7 +32,8 @@ class PaymentGatewayClientTest {
         when(builderMock.baseUrl(anyString())).thenReturn(builderMock);
         when(builderMock.build()).thenReturn(webClientMock);
 
-        PaymentGatewayClient client = new PaymentGatewayClient(builderMock, "http://localhost");
+        MeterRegistry meterRegistry = new SimpleMeterRegistry();
+        PaymentGatewayClient client = new PaymentGatewayClient(builderMock, "http://localhost", meterRegistry);
 
         WebClient.RequestBodyUriSpec requestBodyUriSpecMock = mock(WebClient.RequestBodyUriSpec.class);
         WebClient.RequestBodySpec requestBodySpecMock = mock(WebClient.RequestBodySpec.class);
