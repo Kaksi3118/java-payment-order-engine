@@ -36,3 +36,32 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-gateway:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: 60s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+  retry:
+    instances:
+      payment-gateway:
+        maxAttempts: 5
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+  ratelimiter:
+    instances:
+      payment-gateway:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 5s
+  bulkhead:
+    instances:
+      payment-gateway:
+        maxConcurrentCalls: 20
+        maxWaitDuration: 1s
