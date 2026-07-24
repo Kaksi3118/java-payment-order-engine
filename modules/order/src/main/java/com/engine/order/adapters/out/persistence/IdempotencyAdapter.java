@@ -17,7 +17,7 @@ import java.util.Optional;
  * the cached result if the key AND hash match; throws {@link IdempotencyConflictException}
  * if the key exists but the hash differs (same key used for a different request body).
  */
-@Component
+@Component("orderIdempotencyAdapter")
 public class IdempotencyAdapter implements IdempotencyPort {
 
     private final IdempotencyJpaRepository jpaRepository;

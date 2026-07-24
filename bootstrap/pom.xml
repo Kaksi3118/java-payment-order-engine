@@ -18,6 +18,10 @@
         the production-grade assembly of all bounded contexts into a runnable jar.
     </description>
 
+    <properties>
+        <spring-boot.run.skip>false</spring-boot.run.skip>
+    </properties>
+
     <dependencies>
         <dependency><groupId>com.engine</groupId><artifactId>identity</artifactId></dependency>
         <dependency><groupId>com.engine</groupId><artifactId>order</artifactId></dependency>

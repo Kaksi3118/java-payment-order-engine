@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "PaymentIdempotency")
 @Table(name = "payment_idempotency_keys")
 public class IdempotencyEntity {
 

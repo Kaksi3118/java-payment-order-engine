@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository("paymentIdempotencyJpaRepository")
 public interface IdempotencyJpaRepository extends JpaRepository<IdempotencyEntity, String> {
     Optional<IdempotencyEntity> findByIdempotencyKey(String idempotencyKey);
 }

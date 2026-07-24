@@ -15,7 +15,7 @@ import java.util.Objects;
  * The UNIQUE constraint on {@code idempotency_key} ensures that a concurrent insert race
  * is resolved by the database &mdash; two requests cannot both save the same key.
  */
-@Entity
+@Entity(name = "OrderIdempotency")
 @Table(name = "idempotency_keys")
 public class IdempotencyEntity {
 

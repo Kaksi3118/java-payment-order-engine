@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
-@Component
+@Component("paymentIdempotencyAdapter")
 public class IdempotencyAdapter implements IdempotencyPort {
 
     private final IdempotencyJpaRepository jpaRepository;
