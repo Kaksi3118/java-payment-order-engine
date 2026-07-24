@@ -1,4 +1,8 @@
 spring:
+  docker:
+    compose:
+      file: ../docker-compose.yml
+      lifecycle-management: start-only
   application:
     name: payment-order-engine
   threads:
@@ -11,8 +15,8 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: user
-    password: password
+    username: ${POE_RABBITMQ_USER:poe}
+    password: ${POE_RABBITMQ_PASSWORD:poe_dev_password}
   data:
     redis:
       host: localhost
