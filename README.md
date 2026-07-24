@@ -113,11 +113,11 @@ Run the full suite of unit and integration tests (which utilize Testcontainers) 
 ```bash
 # Windows
 .\mvnw.cmd clean verify
-.\mvnw.cmd -pl bootstrap spring-boot:run
+.\mvnw.cmd -pl bootstrap -am spring-boot:run
 
 # Linux / macOS
 ./mvnw clean verify
-./mvnw -pl bootstrap spring-boot:run
+./mvnw -pl bootstrap -am spring-boot:run
 ```
 The API is now available at `http://localhost:8080`.
 
