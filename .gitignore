@@ -62,3 +62,12 @@ HELP.md
 .gradle/
 build/
 /out/
+
+# ---------- AI / Agent Tooling ----------
+AGENTS.md
+commit-msg.txt
+.gemini/
+.cursor/
+.cursorrules
+.cline/
+.aider*

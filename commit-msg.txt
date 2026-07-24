@@ -1,5 +1,0 @@
-feat(ci): add GitHub Actions build pipeline
-
-- .github/workflows/build.yml: Configure CI pipeline to run on push/PR to main
-- Environment: Ubuntu-latest with Java 21 (Temurin) and Docker pre-installed
-- Command: ./mvnw -B -ntp clean verify to ensure compilation, unit tests, ArchUnit, and Testcontainers ITs all pass
