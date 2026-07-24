@@ -129,6 +129,51 @@ docker compose down -v
 
 ---
 
+## 🎮 Usage / API Examples
+
+Once the application is running, you can interact with the API using `curl` or Postman.
+
+### 1. Register a New User
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com", "password":"securePassword123", "roles":["USER"]}'
+```
+
+### 2. Login & Retrieve JWT
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com", "password":"securePassword123"}'
+```
+*Copy the `accessToken` from the JSON response for the next request.*
+
+### 3. Place an Order
+This request initiates the distributed flow: creating the order, publishing a domain event via the outbox, and automatically triggering the payment gateway.
+```bash
+curl -X POST http://localhost:8080/api/orders \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: my-first-order-123" \
+  -d '{
+    "customerId": "00000000-0000-0000-0000-000000000001",
+    "currency": "USD",
+    "items": [
+      {
+        "productId": "00000000-0000-0000-0000-000000000002",
+        "quantity": 2,
+        "unitPrice": 49.99
+      }
+    ]
+  }'
+```
+
+### 4. Observe Metrics (Prometheus + Grafana)
+- **Actuator Health:** [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
+- **Grafana Dashboard:** [http://localhost:3000](http://localhost:3000) (Login: `admin` / `admin`)
+
+---
+
 ## 📂 Repository Structure
 
 The project uses a standard multi-module Maven reactor:
